@@ -34,9 +34,18 @@
       width: min(70vmin, 360px);
       aspect-ratio: 1;
       position: relative;
+
       transform: rotate(0rad);
+      transform-origin: 50% 50%; /* ✅ ensures rotation about center */
       will-change: transform;
+
       filter: drop-shadow(var(--shadow));
+    }
+
+    .spinner svg {
+      width: 100%;
+      height: 100%;
+      display: block; /* ✅ avoids baseline/layout quirks that can look off-center */
     }
 
     .logo {
@@ -68,9 +77,9 @@
 <body>
   <div class="wrap">
     <div id="spinner" class="spinner">
-      <!-- ONLY CHANGE: spinner geometry updated to match your new SVG -->
-      <svg viewBox="0 0 1000 1000" width="100%" height="100%" aria-hidden="true">
-        <!-- Base + lobes (body) -->
+      <!-- Shape: same SVG body, but NOTCH CUTOUTS REMOVED -->
+      <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <!-- Body -->
         <g fill="var(--body)">
           <circle cx="500" cy="500" r="280" />
           <circle cx="500" cy="187.5" r="170" />
@@ -78,14 +87,7 @@
           <circle cx="500" cy="187.5" r="170" transform="rotate(240 500 500)" />
         </g>
 
-        <!-- Notches / cutouts between lobes: MUST MATCH BACKGROUND -->
-        <g fill="var(--bg)">
-          <circle cx="500" cy="187.5" r="143" transform="rotate(60 500 500)" />
-          <circle cx="500" cy="187.5" r="143" transform="rotate(180 500 500)" />
-          <circle cx="500" cy="187.5" r="143" transform="rotate(300 500 500)" />
-        </g>
-
-        <!-- Outer bearings (same styling idea as before, positioned to match the SVG) -->
+        <!-- Bearings (unchanged styling + positions) -->
         <g>
           <!-- Top -->
           <g transform="translate(500 187.5)">
@@ -94,7 +96,7 @@
             <circle r="45"  fill="var(--white)"/>
           </g>
 
-          <!-- Bottom-right (rotate 120° about center) -->
+          <!-- Bottom-right -->
           <g transform="rotate(120 500 500)">
             <g transform="translate(500 187.5)">
               <circle r="120" fill="var(--ring-dark)"/>
@@ -103,7 +105,7 @@
             </g>
           </g>
 
-          <!-- Bottom-left (rotate 240° about center) -->
+          <!-- Bottom-left -->
           <g transform="rotate(240 500 500)">
             <g transform="translate(500 187.5)">
               <circle r="120" fill="var(--ring-dark)"/>
@@ -112,7 +114,7 @@
             </g>
           </g>
 
-          <!-- Center bearing (kept dark; your logo overlay sits on top exactly like before) -->
+          <!-- Center bearing -->
           <circle cx="500" cy="500" r="150" fill="var(--ring-dark)"/>
         </g>
       </svg>
