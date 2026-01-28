@@ -39,7 +39,6 @@
       filter: drop-shadow(var(--shadow));
     }
 
-    /* Center logo */
     .logo {
       position: absolute;
       inset: 0;
@@ -69,33 +68,50 @@
 <body>
   <div class="wrap">
     <div id="spinner" class="spinner">
-      <!-- Classic spinner geometry -->
       <svg viewBox="-200 -200 400 400" width="100%" height="100%">
-        <!-- Body -->
-        <g fill="var(--body)">
-          <circle cx="0" cy="-100" r="78"/>
-          <circle cx="86.6" cy="50" r="78"/>
-          <circle cx="-86.6" cy="50" r="78"/>
-          <circle cx="0" cy="0" r="95"/>
-        </g>
+        <!--
+          Smooth classic spinner body:
+          One continuous outline around the three outer bearings,
+          with smooth valleys between lobes (matches reference photo).
+        -->
+        <path
+          d="
+            M 0 -178
+            A 78 78 0 0 1 78 -100
+            A 78 78 0 0 1 86.6 -28
 
-        <!-- Bearings -->
+            A 95 95 0 0 0 154.3 89.1
+            A 78 78 0 0 1 86.6 128
+            A 78 78 0 0 1 0 95
+
+            A 95 95 0 0 0 -86.6 128
+            A 78 78 0 0 1 -154.3 89.1
+            A 95 95 0 0 0 -86.6 -28
+
+            A 78 78 0 0 1 -78 -100
+            A 78 78 0 0 1 0 -178
+            Z
+          "
+          fill="var(--body)"
+        />
+
+        <!-- Bearings: three outer + one center (unchanged) -->
         <g>
-          <!-- Top -->
+          <!-- Top bearing -->
           <g transform="translate(0,-100)">
             <circle r="36" fill="var(--ring-dark)"/>
             <circle r="26" fill="var(--body)"/>
             <circle r="14" fill="var(--white)"/>
           </g>
 
-          <!-- Right -->
+          <!-- Right bearing -->
           <g transform="translate(86.6,50)">
             <circle r="36" fill="var(--ring-dark)"/>
             <circle r="26" fill="var(--body)"/>
             <circle r="14" fill="var(--white)"/>
           </g>
 
-          <!-- Left -->
+          <!-- Left bearing -->
           <g transform="translate(-86.6,50)">
             <circle r="36" fill="var(--ring-dark)"/>
             <circle r="26" fill="var(--body)"/>
@@ -107,7 +123,7 @@
         </g>
       </svg>
 
-      <!-- Logo -->
+      <!-- Logo (unchanged) -->
       <div class="logo">
         <div class="logo-circle">
           <img src="logo.png" alt="App logo" />
