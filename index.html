@@ -1,265 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fidget Spinner</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Classic Fidget Spinner</title>
 
-        .container {
-            text-align: center;
-        }
+  <style>
+    :root {
+      --bg: #00A6FB;
+      --body: #ECF6FB;
+      --ring-dark: #0B0B0B;
+      --ring-mid: #1E1E1E;
+      --white: #FFFFFF;
+      --shadow: 0 20px 48px rgba(0,0,0,.25);
+    }
 
-        .spinner-wrapper {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 30px;
-        }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      touch-action: none;
+      overscroll-behavior: none;
+      user-select: none;
+    }
 
-        .spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 280px;
-            height: 280px;
-            transition: transform 0.1s ease-out;
-        }
+    .wrap {
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
 
-        .spinner.spinning {
-            animation: spin 1s linear infinite;
-        }
+    .spinner {
+      width: min(70vmin, 360px);
+      aspect-ratio: 1;
+      position: relative;
+      transform: rotate(0rad);
+      will-change: transform;
+      filter: drop-shadow(var(--shadow));
+    }
 
-        .spinner.fast {
-            animation: spin 0.3s linear infinite;
-        }
+    /* Center logo */
+    .logo {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
 
-        @keyframes spin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
+    .logo-circle {
+      width: 26%;
+      height: 26%;
+      border-radius: 50%;
+      background: var(--ring-dark);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
 
-        /* Center circle */
-        .center-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(145deg, #4a5568, #2d3748);
-            border-radius: 50%;
-            box-shadow: 
-                inset 0 2px 8px rgba(0,0,0,0.4),
-                0 4px 12px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        .center-circle::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle at 35% 35%, #718096, #1a202c);
-            border-radius: 50%;
-            box-shadow: 
-                inset 0 2px 6px rgba(0,0,0,0.6),
-                0 2px 4px rgba(255,255,255,0.1);
-        }
-
-        .center-circle::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            background: #fbbf24;
-            border-radius: 50%;
-            box-shadow: 
-                inset 0 1px 3px rgba(0,0,0,0.4),
-                0 1px 2px rgba(255,255,255,0.3);
-        }
-
-        /* Arm structure */
-        .arm {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 140px;
-            height: 90px;
-            transform-origin: 0% 50%;
-        }
-
-        .arm:nth-child(1) {
-            transform: translate(-50%, -50%) rotate(0deg);
-        }
-
-        .arm:nth-child(2) {
-            transform: translate(-50%, -50%) rotate(120deg);
-        }
-
-        .arm:nth-child(3) {
-            transform: translate(-50%, -50%) rotate(240deg);
-        }
-
-        /* Arm body */
-        .arm-body {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 110px;
-            height: 70px;
-            background: linear-gradient(145deg, #14b8a6, #0d9488);
-            transform: translateY(-50%);
-            border-radius: 0 50% 50% 0;
-            box-shadow: 
-                0 4px 12px rgba(0,0,0,0.3),
-                inset 0 2px 4px rgba(255,255,255,0.2);
-        }
-
-        /* Outer circle on each arm */
-        .outer-circle {
-            position: absolute;
-            top: 50%;
-            right: -35px;
-            transform: translateY(-50%);
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(145deg, #e5e7eb, #d1d5db);
-            border-radius: 50%;
-            box-shadow: 
-                0 4px 12px rgba(0,0,0,0.3),
-                inset 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .outer-circle::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 45px;
-            height: 45px;
-            background: radial-gradient(circle at 35% 35%, #f3f4f6, #9ca3af);
-            border-radius: 50%;
-            box-shadow: 
-                inset 0 2px 6px rgba(0,0,0,0.3),
-                0 1px 3px rgba(255,255,255,0.2);
-        }
-
-        .outer-circle::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 25px;
-            height: 25px;
-            background: linear-gradient(145deg, #6b7280, #374151);
-            border-radius: 50%;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        /* Controls */
-        button {
-            margin: 10px;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(145deg, #14b8a6, #0d9488);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .info {
-            color: white;
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-    </style>
+    .logo-circle img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="spinner-wrapper">
-            <div class="spinner" id="spinner">
-                <div class="arm">
-                    <div class="arm-body"></div>
-                    <div class="outer-circle"></div>
-                </div>
-                <div class="arm">
-                    <div class="arm-body"></div>
-                    <div class="outer-circle"></div>
-                </div>
-                <div class="arm">
-                    <div class="arm-body"></div>
-                    <div class="outer-circle"></div>
-                </div>
-                <div class="center-circle"></div>
-            </div>
+  <div class="wrap">
+    <div id="spinner" class="spinner">
+      <!-- Classic spinner geometry -->
+      <svg viewBox="-200 -200 400 400" width="100%" height="100%">
+        <!-- Body -->
+        <g fill="var(--body)">
+          <circle cx="0" cy="-100" r="78"/>
+          <circle cx="86.6" cy="50" r="78"/>
+          <circle cx="-86.6" cy="50" r="78"/>
+          <circle cx="0" cy="0" r="95"/>
+        </g>
+
+        <!-- Bearings -->
+        <g>
+          <!-- Top -->
+          <g transform="translate(0,-100)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Right -->
+          <g transform="translate(86.6,50)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Left -->
+          <g transform="translate(-86.6,50)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Center bearing -->
+          <circle r="50" fill="var(--ring-dark)"/>
+        </g>
+      </svg>
+
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-circle">
+          <img src="logo.png" alt="App logo" />
         </div>
-        
-        <div>
-            <button onclick="spinSlow()">Spin Slow</button>
-            <button onclick="spinFast()">Spin Fast</button>
-            <button onclick="stopSpin()">Stop</button>
-        </div>
-        
-        <div class="info">
-            Click the buttons to control the spinner!
-        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const spinner = document.getElementById('spinner');
+  <script>
+    (() => {
+      const spinner = document.getElementById("spinner");
 
-        function spinSlow() {
-            spinner.className = 'spinner spinning';
+      let angle = 0;
+      let omega = 0;
+      let dragging = false;
+
+      const MAX_OMEGA = 32;
+      const FRICTION = 1.6;
+      const MIN_OMEGA = 0.05;
+
+      let center = { x: 0, y: 0 };
+      let lastAngle = 0;
+      const samples = [];
+
+      function updateCenter() {
+        const r = spinner.getBoundingClientRect();
+        center.x = r.left + r.width / 2;
+        center.y = r.top + r.height / 2;
+      }
+
+      function pointerAngle(x, y) {
+        return Math.atan2(y - center.y, x - center.x);
+      }
+
+      function normalize(d) {
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        return d;
+      }
+
+      function setRotation(r) {
+        angle = r;
+        spinner.style.transform = `rotate(${angle}rad)`;
+      }
+
+      function estimateOmega() {
+        if (samples.length < 2) return 0;
+        const first = samples[0];
+        const last = samples[samples.length - 1];
+        const dt = (last.t - first.t) / 1000;
+        if (dt <= 0) return 0;
+        return (last.a - first.a) / dt;
+      }
+
+      spinner.addEventListener("pointerdown", e => {
+        updateCenter();
+        dragging = true;
+        omega = 0;
+        samples.length = 0;
+        lastAngle = pointerAngle(e.clientX, e.clientY);
+        samples.push({ t: performance.now(), a: lastAngle });
+        spinner.setPointerCapture(e.pointerId);
+      });
+
+      spinner.addEventListener("pointermove", e => {
+        if (!dragging) return;
+        const a = pointerAngle(e.clientX, e.clientY);
+        const d = normalize(a - lastAngle);
+        setRotation(angle + d);
+        lastAngle = a;
+        samples.push({ t: performance.now(), a });
+        if (samples.length > 8) samples.shift();
+      });
+
+      spinner.addEventListener("pointerup", () => {
+        dragging = false;
+        omega = Math.max(-MAX_OMEGA, Math.min(MAX_OMEGA, estimateOmega()));
+        if (Math.abs(omega) < 0.6) omega = 0;
+      });
+
+      let lastFrame = performance.now();
+      function animate(now) {
+        const dt = (now - lastFrame) / 1000;
+        lastFrame = now;
+
+        if (!dragging && Math.abs(omega) > 0) {
+          omega *= Math.exp(-FRICTION * dt);
+          if (Math.abs(omega) < MIN_OMEGA) omega = 0;
+          else setRotation(angle + omega * dt);
         }
+        requestAnimationFrame(animate);
+      }
 
-        function spinFast() {
-            spinner.className = 'spinner spinning fast';
-        }
-
-        function stopSpin() {
-            spinner.className = 'spinner';
-        }
-
-        // Click to spin functionality
-        spinner.addEventListener('click', function() {
-            if (!spinner.classList.contains('spinning')) {
-                spinFast();
-            }
-        });
-    </script>
+      updateCenter();
+      window.addEventListener("resize", updateCenter);
+      requestAnimationFrame(animate);
+    })();
+  </script>
 </body>
 </html>
