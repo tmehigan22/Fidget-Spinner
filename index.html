@@ -3,154 +3,114 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fidget Spinner</title>
+  <title>Classic Fidget Spinner</title>
+
   <style>
-    :root{
+    :root {
       --bg: #00A6FB;
-
-      /* Sampled from your reference image */
-      --teal: #17A6A2;          /* spinner body */
-      --outerStroke: #E4F5F7;   /* thin outer outline */
-      --ringDark: #0B0B0B;      /* dark rings */
-      --ringMid: #193637;       /* subtle inner dark */
+      --body: #ECF6FB;
+      --ring-dark: #0B0B0B;
+      --ring-mid: #1E1E1E;
       --white: #FFFFFF;
-
-      --shadow: 0 18px 46px rgba(0,0,0,.28);
+      --shadow: 0 20px 48px rgba(0,0,0,.25);
     }
 
     html, body {
       height: 100%;
       margin: 0;
       background: var(--bg);
-      touch-action: none;            /* keep drag smooth on mobile */
+      touch-action: none;
       overscroll-behavior: none;
       user-select: none;
-      -webkit-user-select: none;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .wrap{
+    .wrap {
       height: 100%;
       display: grid;
       place-items: center;
-      padding: 24px;
-      box-sizing: border-box;
     }
 
-    /* Rotating container */
     .spinner {
-      width: min(72vmin, 380px);
-      aspect-ratio: 1 / 1;
+      width: min(70vmin, 360px);
+      aspect-ratio: 1;
       position: relative;
       transform: rotate(0rad);
       will-change: transform;
       filter: drop-shadow(var(--shadow));
     }
 
-    /* Center logo badge */
-    .logo-badge{
+    /* Center logo */
+    .logo {
       position: absolute;
       inset: 0;
       display: grid;
       place-items: center;
-      pointer-events: none; /* don’t interfere with spinning */
+      pointer-events: none;
     }
 
-    .logo-circle{
-      width: 28%;
-      height: 28%;
+    .logo-circle {
+      width: 26%;
+      height: 26%;
       border-radius: 50%;
-      background: var(--ringDark);
-      border: 2px solid rgba(255,255,255,.18);
-      box-sizing: border-box;
+      background: var(--ring-dark);
       display: grid;
       place-items: center;
       overflow: hidden;
     }
 
-    .logo-circle img{
-      width: 74%;
-      height: 74%;
+    .logo-circle img {
+      width: 70%;
+      height: 70%;
       object-fit: contain;
-      display: block;
-    }
-
-    /* Optional: if logo image is missing, show text */
-    .logo-fallback{
-      color: rgba(255,255,255,.85);
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: .3px;
-      display: none;
-      text-align: center;
-      padding: 0 10px;
-      line-height: 1.05;
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div id="spinner" class="spinner" aria-label="Fidget spinner">
-      <!-- Spinner artwork (SVG for accurate look) -->
-      <svg viewBox="-190 -190 380 380" width="100%" height="100%" aria-hidden="true">
-        <!-- Body (3-lobe) -->
-        <defs>
-          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="0.35" result="b"/>
-            <feOffset in="b" dx="0" dy="0.8" result="o"/>
-            <feMerge>
-              <feMergeNode in="o"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- Construct the body using union-like shapes (3 circles + center) -->
-        <g filter="url(#soft)">
-          <!-- Outer stroke -->
-          <g>
-            <circle cx="0" cy="-95" r="70" fill="var(--teal)" stroke="var(--outerStroke)" stroke-width="4"/>
-            <circle cx="82.27" cy="47.5" r="70" fill="var(--teal)" stroke="var(--outerStroke)" stroke-width="4"/>
-            <circle cx="-82.27" cy="47.5" r="70" fill="var(--teal)" stroke="var(--outerStroke)" stroke-width="4"/>
-            <circle cx="0" cy="0" r="90" fill="var(--teal)" stroke="var(--outerStroke)" stroke-width="4"/>
-          </g>
+    <div id="spinner" class="spinner">
+      <!-- Classic spinner geometry -->
+      <svg viewBox="-200 -200 400 400" width="100%" height="100%">
+        <!-- Body -->
+        <g fill="var(--body)">
+          <circle cx="0" cy="-100" r="78"/>
+          <circle cx="86.6" cy="50" r="78"/>
+          <circle cx="-86.6" cy="50" r="78"/>
+          <circle cx="0" cy="0" r="95"/>
         </g>
 
-        <!-- Bearing rings (match reference: dark ring + teal ring + white center) -->
-        <!-- Top bearing -->
-        <g transform="translate(0,-95)">
-          <circle r="34" fill="var(--ringDark)"/>
-          <circle r="24" fill="var(--teal)"/>
-          <circle r="13" fill="var(--white)"/>
-          <circle r="5.5" fill="var(--ringMid)" opacity=".9"/>
-        </g>
-        <!-- Right bearing -->
-        <g transform="translate(82.27,47.5)">
-          <circle r="34" fill="var(--ringDark)"/>
-          <circle r="24" fill="var(--teal)"/>
-          <circle r="13" fill="var(--white)"/>
-          <circle r="5.5" fill="var(--ringMid)" opacity=".9"/>
-        </g>
-        <!-- Left bearing -->
-        <g transform="translate(-82.27,47.5)">
-          <circle r="34" fill="var(--ringDark)"/>
-          <circle r="24" fill="var(--teal)"/>
-          <circle r="13" fill="var(--white)"/>
-          <circle r="5.5" fill="var(--ringMid)" opacity=".9"/>
-        </g>
-
-        <!-- Center hub ring behind logo -->
+        <!-- Bearings -->
         <g>
-          <circle r="54" fill="var(--ringDark)"/>
-          <circle r="46" fill="var(--ringMid)" opacity=".65"/>
+          <!-- Top -->
+          <g transform="translate(0,-100)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Right -->
+          <g transform="translate(86.6,50)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Left -->
+          <g transform="translate(-86.6,50)">
+            <circle r="36" fill="var(--ring-dark)"/>
+            <circle r="26" fill="var(--body)"/>
+            <circle r="14" fill="var(--white)"/>
+          </g>
+
+          <!-- Center bearing -->
+          <circle r="50" fill="var(--ring-dark)"/>
         </g>
       </svg>
 
-      <!-- Center logo overlay -->
-      <div class="logo-badge">
+      <!-- Logo -->
+      <div class="logo">
         <div class="logo-circle">
-          <img id="logoImg" alt="App logo" />
-          <div id="logoFallback" class="logo-fallback">YOUR<br>LOGO</div>
+          <img src="logo.png" alt="App logo" />
         </div>
       </div>
     </div>
@@ -158,157 +118,92 @@
 
   <script>
     (() => {
-      // Put your logo file next to this HTML as "logo.png"
-      // Or change this URL to something else (including a data: URI).
-      const LOGO_URL = "logo.png";
+      const spinner = document.getElementById("spinner");
 
-      const logoImg = document.getElementById("logoImg");
-      const logoFallback = document.getElementById("logoFallback");
-
-      logoImg.src = LOGO_URL;
-      logoImg.addEventListener("error", () => {
-        logoImg.style.display = "none";
-        logoFallback.style.display = "block";
-      });
-
-      const el = document.getElementById("spinner");
-
-      // State (radians)
       let angle = 0;
-      let omega = 0;              // angular velocity (rad/s)
+      let omega = 0;
       let dragging = false;
 
-      // Physics tuning (feel free to tweak)
-      const MAX_OMEGA = 34;       // cap speed
-      const FRICTION = 1.55;      // higher = stops faster
-      const MIN_OMEGA = 0.04;     // dead zone (no tap-to-nudge)
+      const MAX_OMEGA = 32;
+      const FRICTION = 1.6;
+      const MIN_OMEGA = 0.05;
 
-      // Pointer tracking
       let center = { x: 0, y: 0 };
-      let lastPointerAngle = 0;
-      const samples = [];         // {t, a}
-      const MAX_SAMPLES = 8;
+      let lastAngle = 0;
+      const samples = [];
 
-      function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-
-      function updateCenter(){
-        const r = el.getBoundingClientRect();
+      function updateCenter() {
+        const r = spinner.getBoundingClientRect();
         center.x = r.left + r.width / 2;
         center.y = r.top + r.height / 2;
       }
 
-      function pointerAngle(clientX, clientY){
-        const dx = clientX - center.x;
-        const dy = clientY - center.y;
-        return Math.atan2(dy, dx);
+      function pointerAngle(x, y) {
+        return Math.atan2(y - center.y, x - center.x);
       }
 
-      function normalizeDelta(d){
+      function normalize(d) {
         while (d > Math.PI) d -= Math.PI * 2;
         while (d < -Math.PI) d += Math.PI * 2;
         return d;
       }
 
-      function setRotation(rad){
-        angle = rad;
-        el.style.transform = `rotate(${angle}rad)`;
+      function setRotation(r) {
+        angle = r;
+        spinner.style.transform = `rotate(${angle}rad)`;
       }
 
-      function estimateOmegaFromSamples(){
+      function estimateOmega() {
         if (samples.length < 2) return 0;
-
-        // unwrap angles
-        const unwrapped = [samples[0].a];
-        for (let i = 1; i < samples.length; i++){
-          const prev = unwrapped[i - 1];
-          let delta = samples[i].a - samples[i - 1].a;
-          delta = normalizeDelta(delta);
-          unwrapped.push(prev + delta);
-        }
-
-        const t0 = samples[0].t;
-        const t1 = samples[samples.length - 1].t;
-        const dt = (t1 - t0) / 1000;
+        const first = samples[0];
+        const last = samples[samples.length - 1];
+        const dt = (last.t - first.t) / 1000;
         if (dt <= 0) return 0;
-
-        const da = unwrapped[unwrapped.length - 1] - unwrapped[0];
-        return da / dt;
+        return (last.a - first.a) / dt;
       }
 
-      function onPointerDown(e){
+      spinner.addEventListener("pointerdown", e => {
         updateCenter();
-        el.setPointerCapture?.(e.pointerId);
-
         dragging = true;
         omega = 0;
         samples.length = 0;
+        lastAngle = pointerAngle(e.clientX, e.clientY);
+        samples.push({ t: performance.now(), a: lastAngle });
+        spinner.setPointerCapture(e.pointerId);
+      });
 
-        lastPointerAngle = pointerAngle(e.clientX, e.clientY);
-        const t = performance.now();
-        samples.push({ t, a: lastPointerAngle });
-
-        e.preventDefault();
-      }
-
-      function onPointerMove(e){
+      spinner.addEventListener("pointermove", e => {
         if (!dragging) return;
-
-        const t = performance.now();
-        const pa = pointerAngle(e.clientX, e.clientY);
-        const d = normalizeDelta(pa - lastPointerAngle);
-
+        const a = pointerAngle(e.clientX, e.clientY);
+        const d = normalize(a - lastAngle);
         setRotation(angle + d);
+        lastAngle = a;
+        samples.push({ t: performance.now(), a });
+        if (samples.length > 8) samples.shift();
+      });
 
-        lastPointerAngle = pa;
-
-        samples.push({ t, a: pa });
-        if (samples.length > MAX_SAMPLES) samples.shift();
-
-        e.preventDefault();
-      }
-
-      function onPointerUp(e){
-        if (!dragging) return;
+      spinner.addEventListener("pointerup", () => {
         dragging = false;
-
-        omega = clamp(estimateOmegaFromSamples(), -MAX_OMEGA, MAX_OMEGA);
-
-        // No tap-to-nudge: if it wasn’t a real flick, just stop.
+        omega = Math.max(-MAX_OMEGA, Math.min(MAX_OMEGA, estimateOmega()));
         if (Math.abs(omega) < 0.6) omega = 0;
+      });
 
-        e.preventDefault();
-      }
-
-      // Animation loop
       let lastFrame = performance.now();
-      function tick(now){
+      function animate(now) {
         const dt = (now - lastFrame) / 1000;
         lastFrame = now;
 
-        if (!dragging && Math.abs(omega) > 0){
-          const decay = Math.exp(-FRICTION * dt);
-          omega *= decay;
-
-          if (Math.abs(omega) < MIN_OMEGA) {
-            omega = 0;
-          } else {
-            setRotation(angle + omega * dt);
-          }
+        if (!dragging && Math.abs(omega) > 0) {
+          omega *= Math.exp(-FRICTION * dt);
+          if (Math.abs(omega) < MIN_OMEGA) omega = 0;
+          else setRotation(angle + omega * dt);
         }
-
-        requestAnimationFrame(tick);
+        requestAnimationFrame(animate);
       }
 
       updateCenter();
-      window.addEventListener("resize", updateCenter, { passive: true });
-      window.addEventListener("scroll", updateCenter, { passive: true });
-
-      el.addEventListener("pointerdown", onPointerDown, { passive: false });
-      el.addEventListener("pointermove", onPointerMove, { passive: false });
-      el.addEventListener("pointerup", onPointerUp, { passive: false });
-      el.addEventListener("pointercancel", onPointerUp, { passive: false });
-
-      requestAnimationFrame(tick);
+      window.addEventListener("resize", updateCenter);
+      requestAnimationFrame(animate);
     })();
   </script>
 </body>
