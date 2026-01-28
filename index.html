@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fidget Spinner</title>
+  <style>
+    :root {
+      --bg: #e7f0fb;           /* light pale blue */
+      --spinner: #ffffff;      /* spinner body */
+      --spinner-edge: #cfd8e3; /* subtle edge */
+      --hub: #f2f4f7;          /* center hub */
+      --hub-edge: #11111120;   /* hub outline */
+      --shadow: 0 18px 40px rgba(0,0,0,.14);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      touch-action: none; /* important: let us handle dragging smoothly */
+      user-select: none;
+      -webkit-user-select: none;
+      overscroll-behavior: none;
+    }
+
+    .wrap {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    /* Container that rotates */
+    .spinner {
+      width: min(72vmin, 360px);
+      aspect-ratio: 1 / 1;
+      position: relative;
+      transform: rotate(0rad);
+      will-change: transform;
+      filter: drop-shadow(var(--shadow));
+    }
+
+    /* The three lobes + body */
+    .body {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    /* Create 3 lobes using pseudo elements */
+    .lobe {
+      position: absolute;
+      width: 44%;
+      height: 44%;
+      background: var(--spinner);
+      border: 2px solid var(--spinner-edge);
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-sizing: border-box;
+    }
+
+    .lobe.one   { transform: translate(-50%, -50%) translateY(-60%); }
+    .lobe.two   { transform: translate(-50%, -50%) rotate(120deg) translateY(-60%) rotate(-120deg); }
+    .lobe.three { transform: translate(-50%, -50%) rotate(240deg) translateY(-60%) rotate(-240deg); }
+
+    /* Central tri-bridge (soft rounded triangle) */
+    .bridge {
+      position: absolute;
+      inset: 18%;
+      background: var(--spinner);
+      border: 2px solid var(--spinner-edge);
+      border-radius: 26%;
+      transform: rotate(45deg);
+      box-sizing: border-box;
+    }
+
+    /* Cutouts inside lobes for a more spinner-like look */
+    .cutout {
+      position: absolute;
+      width: 18%;
+      height: 18%;
+      background: var(--bg);
+      border-radius: 50%;
+      border: 2px solid var(--spinner-edge);
+      box-sizing: border-box;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .cutout.one   { transform: translate(-50%, -50%) translateY(-120%); }
+    .cutout.two   { transform: translate(-50%, -50%) rotate(120deg) translateY(-120%) rotate(-120deg); }
+    .cutout.three { transform: translate(-50%, -50%) rotate(240deg) translateY(-120%) rotate(-240deg); }
+
+    /* Center hub */
+    .hub {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 26%;
+      height: 26%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--hub) 55%, #e6e8ee 100%);
+      border: 2px solid var(--hub-edge);
+      box-sizing: border-box;
+    }
+
+    .hub::after {
+      content: "";
+      position: absolute;
+      inset: 20%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f7f7fa 60%, #e9ebf1 100%);
+      border: 1px solid rgba(0,0,0,.12);
+    }
+
+    /* Optional helper text (can be removed) */
+    .hint {
+      margin-top: 18px;
+      text-align: center;
+      color: rgba(0,0,0,.55);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="spinner" class="spinner" aria-label="Fidget spinner">
+      <div class="body">
+        <div class="bridge"></div>
+
+        <div class="lobe one"></div>
+        <div class="lobe two"></div>
+        <div class="lobe three"></div>
+
+        <div class="cutout one"></div>
+        <div class="cutout two"></div>
+        <div class="cutout three"></div>
+
+        <div class="hub"></div>
+      </div>
+    </div>
+
+    <div class="hint">Drag to spin • Flick for momentum • Tap to nudge</div>
+  </div>
+
+  <script>
+    (() => {
+      const el = document.getElementById("spinner");
+
+      // State (radians)
+      let angle = 0;
+      let omega = 0;                // angular velocity (rad/s)
+      let dragging = false;
+
+      // Physics tuning
+      const MAX_OMEGA = 35;         // cap spin speed
+      const FRICTION = 1.35;        // higher = stops faster (roughly 1/s)
+      const TAP_NUDGE = 6.0;        // rad/s added on tap
+      const MIN_OMEGA = 0.02;       // dead zone
+
+      // Pointer tracking
+      let center = { x: 0, y: 0 };
+      let lastPointerAngle = 0;
+      let lastTime = 0;
+
+      // For estimating flick velocity
+      const samples = []; // {t, a}
+      const MAX_SAMPLES = 8;
+
+      function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+      function updateCenter() {
+        const r = el.getBoundingClientRect();
+        center.x = r.left + r.width / 2;
+        center.y = r.top + r.height / 2;
+      }
+
+      function pointerAngle(clientX, clientY) {
+        const dx = clientX - center.x;
+        const dy = clientY - center.y;
+        return Math.atan2(dy, dx);
+      }
+
+      function normalizeDelta(d) {
+        // normalize to [-pi, pi] to prevent jumps across wrap-around
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        return d;
+      }
+
+      function setRotation(rad) {
+        angle = rad;
+        el.style.transform = `rotate(${angle}rad)`;
+      }
+
+      function postToHost(type, payload) {
+        // React Native WebView bridge support (optional)
+        try {
+          if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type, payload }));
+          }
+        } catch (_) {}
+      }
+
+      function onPointerDown(e) {
+        updateCenter();
+        el.setPointerCapture?.(e.pointerId);
+
+        dragging = true;
+        omega = 0; // pause inertia while dragging
+        samples.length = 0;
+
+        lastPointerAngle = pointerAngle(e.clientX, e.clientY);
+        lastTime = performance.now();
+
+        samples.push({ t: lastTime, a: lastPointerAngle });
+
+        // Prevent page gestures
+        e.preventDefault();
+      }
+
+      function onPointerMove(e) {
+        if (!dragging) return;
+
+        const t = performance.now();
+        const pa = pointerAngle(e.clientX, e.clientY);
+        const d = normalizeDelta(pa - lastPointerAngle);
+
+        setRotation(angle + d);
+
+        lastPointerAngle = pa;
+        lastTime = t;
+
+        samples.push({ t, a: pa });
+        if (samples.length > MAX_SAMPLES) samples.shift();
+
+        e.preventDefault();
+      }
+
+      function estimateOmegaFromSamples() {
+        // Use last ~80-150ms worth of samples, unwrap angles
+        if (samples.length < 2) return 0;
+
+        // unwrap
+        const unwrapped = [samples[0].a];
+        for (let i = 1; i < samples.length; i++) {
+          const prev = unwrapped[i - 1];
+          let cur = samples[i].a;
+          let delta = cur - samples[i - 1].a;
+          delta = normalizeDelta(delta);
+          unwrapped.push(prev + delta);
+        }
+
+        const t0 = samples[0].t;
+        const t1 = samples[samples.length - 1].t;
+        const dt = (t1 - t0) / 1000;
+        if (dt <= 0) return 0;
+
+        const da = unwrapped[unwrapped.length - 1] - unwrapped[0];
+        return da / dt;
+      }
+
+      function onPointerUp(e) {
+        if (!dragging) return;
+        dragging = false;
+
+        const est = estimateOmegaFromSamples();
+        omega = clamp(est, -MAX_OMEGA, MAX_OMEGA);
+
+        // If it was basically a tap (little movement), nudge it
+        if (Math.abs(omega) < 0.4) {
+          // Determine tap direction based on which side of center was tapped
+          updateCenter();
+          const dx = e.clientX - center.x;
+          const dy = e.clientY - center.y;
+          // tangential sign (right-hand rule)
+          const sign = (dx * 0 - dy * 1) >= 0 ? 1 : -1; // simple heuristic
+          omega = clamp(sign * TAP_NUDGE, -MAX_OMEGA, MAX_OMEGA);
+        }
+
+        postToHost("spinner_spin", { omega });
+
+        e.preventDefault();
+      }
+
+      // Animation loop
+      let lastFrame = performance.now();
+      function tick(now) {
+        const dt = (now - lastFrame) / 1000;
+        lastFrame = now;
+
+        if (!dragging) {
+          if (Math.abs(omega) > MIN_OMEGA) {
+            // exponential decay
+            const decay = Math.exp(-FRICTION * dt);
+            omega *= decay;
+
+            setRotation(angle + omega * dt);
+          } else {
+            omega = 0;
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      // Setup
+      updateCenter();
+      window.addEventListener("resize", updateCenter, { passive: true });
+      window.addEventListener("scroll", updateCenter, { passive: true });
+
+      el.addEventListener("pointerdown", onPointerDown, { passive: false });
+      el.addEventListener("pointermove", onPointerMove, { passive: false });
+      el.addEventListener("pointerup", onPointerUp, { passive: false });
+      el.addEventListener("pointercancel", onPointerUp, { passive: false });
+
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
